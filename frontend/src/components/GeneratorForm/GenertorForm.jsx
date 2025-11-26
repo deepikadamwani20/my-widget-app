@@ -27,15 +27,16 @@ const GeneratorForm = () => {
 
     try {
       const sdnToken = generateSDN();
-     const embedScript = `<script
-           src="https://my-widget-app.onrender.com/embed.js"
-    data-sdn="${sdn}"
-async></script>`;
+  const embedScript = `<script 
+    src="https://profound-granita-99a220.netlify.app/embed.js" 
+    data-sdn="${sdnToken}" 
+    async>
+</script>`;
       
       const embedJsContent = `(function () {
   const sdn = document.currentScript.getAttribute("data-sdn");
   const iframe = document.createElement("iframe");
-  iframe.src = "https://widget.yourdomain.com/chat?sdn=" + encodeURIComponent(sdn);
+  iframe.src = "https://my-widget-app.onrender.com/chat?sdn=" + encodeURIComponent(sdn);
   iframe.style.position = "fixed";
   iframe.style.bottom = "20px";
   iframe.style.right = "20px";
