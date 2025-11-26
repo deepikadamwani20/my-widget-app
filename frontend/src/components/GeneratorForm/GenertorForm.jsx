@@ -27,7 +27,10 @@ const GeneratorForm = () => {
 
     try {
       const sdnToken = generateSDN();
-      const embedScript = `<script src="https://cdn.yourdomain.com/embed.js" data-sdn="${sdnToken}" async></script>`;
+     const embedScript = `<script
+           src="https://my-widget-app.onrender.com/embed.js"
+    data-sdn="${sdn}"
+async></script>`;
       
       const embedJsContent = `(function () {
   const sdn = document.currentScript.getAttribute("data-sdn");

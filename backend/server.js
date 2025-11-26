@@ -141,6 +141,10 @@ app.get('/api/chatbots', (req, res) => {
 app.get('/embed.js', (req, res) => {
   console.log("🔥 embed.js REQUESTED");
 
+  // Use environment variable FRONTEND_URL or default to localhost for development
+  const FRONTEND_URL = process.env.FRONTEND_URL || "https://profound-granita-99a220.netlify.app";
+;
+
   const embedScript = `
 (function () {
   const currentScript = document.currentScript;
@@ -152,8 +156,7 @@ app.get('/embed.js', (req, res) => {
   }
 
   const iframe = document.createElement("iframe");
-  iframe.src = "http://localhost:5000/chat?sdn=" + encodeURIComponent(sdn);
-
+  iframe.src = "${FRONTEND_URL}/chat?sdn=" + encodeURIComponent(sdn);
 
   iframe.style.position = "fixed";
   iframe.style.bottom = "20px";
@@ -171,6 +174,7 @@ app.get('/embed.js', (req, res) => {
   res.setHeader("Content-Type", "application/javascript");
   res.send(embedScript);
 });
+
 
 
 app.get('/chat', (req, res) => {
