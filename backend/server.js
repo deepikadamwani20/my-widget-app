@@ -219,8 +219,7 @@ app.get('/chat', (req, res) => {
   res.setHeader("X-Frame-Options", "ALLOWALL");
   res.setHeader("Content-Security-Policy", "frame-ancestors *");
 
-  res.send(`
-<!DOCTYPE html>
+  res.send(`<!DOCTYPE html>
 <html>
 <head>
   <title>Chatbot Widget</title>
@@ -262,10 +261,12 @@ app.get('/chat', (req, res) => {
       <button id="closeBtn">×</button>
     </div>
 
-    <div id="messages"><p><b>Bot:</b> Hello! How can I help you today?</p></div>
+    <div id="messages">
+      <p><b>Bot:</b> Hello! How can I help you today?</p>
+    </div>
 
     <div id="inputBox">
-      <input id="userInput" placeholder="Type message..."/>
+      <input id="userInput" placeholder="Type message..." />
       <button onclick="sendMessage()">Send</button>
     </div>
   </div>
@@ -287,15 +288,14 @@ app.get('/chat', (req, res) => {
       inp.value = "";
     }
 
-    // ---> Close chatbot button handler
     document.getElementById("closeBtn").addEventListener("click", () => {
       window.parent.postMessage("toggleChat", "*");
     });
   </script>
 </body>
-</html>
-  `);
+</html>`);
 });
+
 
 // Health check
 app.get('/health', (req, res) => {
