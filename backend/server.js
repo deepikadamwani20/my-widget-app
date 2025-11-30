@@ -147,33 +147,71 @@ app.get('/embed.js', (req, res) => {
 
   const embedScript = `
 (function () {
-  const currentScript = document.currentScript;
-  const sdn = currentScript.getAttribute("data-sdn");
+  const sdn = document.currentScript.getAttribute("data-sdn");
 
   if (!sdn) {
-    console.error("Chatbot: SDN token missing in embed tag");
+    console.error("Chatbot: SDN token missing");
     return;
   }
 
-  const iframe = document.createElement("iframe");
-  iframe.src = "${FRONTEND_URL}/chat?sdn=" + encodeURIComponent(sdn);
+  // --- Create floating bot button ---
+  const botButton = document.createElement("div");
+  botButton.style.position = "fixed";
+  botButton.style.bottom = "20px";
+  botButton.style.right = "20px";
+  botButton.style.width = "60px";
+  botButton.style.height = "60px";
+  botButton.style.borderRadius = "50%";
+  botButton.style.background = "#4f46e5";
+  botButton.style.display = "flex";
+  botButton.style.justifyContent = "center";
+  botButton.style.alignItems = "center";
+  botButton.style.cursor = "pointer";
+  botButton.style.boxShadow = "0px 4px 10px rgba(0,0,0,0.25)";
+  botButton.style.zIndex = "999999";
+  
+  botButton.innerHTML = "🤖"; // You can replace with an image later
 
+  document.body.appendChild(botButton);
+
+  // --- Create iframe but keep hidden ---
+  const iframe = document.createElement("iframe");
+  iframe.src = window.location.origin + "/chat?sdn=" + encodeURIComponent(sdn);
   iframe.style.position = "fixed";
-  iframe.style.bottom = "20px";
+  iframe.style.bottom = "100px";
   iframe.style.right = "20px";
   iframe.style.width = "360px";
   iframe.style.height = "520px";
   iframe.style.border = "none";
-  iframe.style.zIndex = "999999";
   iframe.style.borderRadius = "12px";
   iframe.style.boxShadow = "0 4px 20px rgba(0,0,0,0.15)";
+  iframe.style.zIndex = "999999";
+  iframe.style.opacity = "0";
+  iframe.style.transform = "scale(0.95)";
+  iframe.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+  iframe.style.display = "none"; // Hidden initially
 
-  document.body.appendChild(iframe);
-})();`;
+  document.body.appendChild(iframe)`;
 
-  res.setHeader("Content-Type", "application/javascript");
-  res.send(embedScript);
-});
+  let isOpen = false;
+
+  // --- Toggle widget functionality ---
+  botButton.addEventListener("click", () => {
+    if (!isOpen) {
+      iframe.style.display = "block";
+      setTimeout(() => {
+        iframe.style.opacity = "1";
+        iframe.style.transform = "scale(1)";
+      }, 10);
+    } else {
+      iframe.style.opacity = "0";
+      iframe.style.transform = "scale(0.95)";
+      setTimeout(() => (iframe.style.display = "none"), 300);
+    }
+    isOpen = !isOpen;
+  });
+})();
+
 
 
 
@@ -188,8 +226,28 @@ app.get('/chat', (req, res) => {
   <title>Chatbot Widget</title>
   <style>
     body { margin: 0; font-family: Arial; background: #fff; }
-    #container { height: 100vh; display: flex; flex-direction: column; }
-    #header { background: #4f46e5; color: white; padding: 12px; text-align: center; }
+    #container { height: 100vh; display: flex; flex-direction: column; position: relative; }
+
+    #header { 
+      background: #4f46e5; 
+      color: white; 
+      padding: 12px; 
+      text-align: center; 
+      font-weight: 600;
+      position: relative;
+    }
+
+    #closeBtn {
+      position: absolute;
+      right: 12px;
+      top: 8px;
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
     #messages { flex: 1; overflow-y: auto; padding: 10px; }
     #inputBox { display: flex; padding: 10px; gap: 8px; background: #f3f3f3; }
     #userInput { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
@@ -199,7 +257,11 @@ app.get('/chat', (req, res) => {
 
 <body>
   <div id="container">
-    <div id="header">Chatbot</div>
+    <div id="header">
+      Chatbot
+      <button id="closeBtn">×</button>
+    </div>
+
     <div id="messages"><p><b>Bot:</b> Hello! How can I help you today?</p></div>
 
     <div id="inputBox">
@@ -224,6 +286,11 @@ app.get('/chat', (req, res) => {
 
       inp.value = "";
     }
+
+    // ---> Close chatbot button handler
+    document.getElementById("closeBtn").addEventListener("click", () => {
+      window.parent.postMessage("toggleChat", "*");
+    });
   </script>
 </body>
 </html>
