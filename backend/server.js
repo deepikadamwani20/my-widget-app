@@ -141,9 +141,7 @@ app.get('/api/chatbots', (req, res) => {
 app.get('/embed.js', (req, res) => {
   console.log("🔥 embed.js REQUESTED");
 
-  // Use environment variable FRONTEND_URL or default to localhost for development
   const FRONTEND_URL = process.env.FRONTEND_URL || "https://profound-granita-99a220.netlify.app";
-;
 
   const embedScript = `
 (function () {
@@ -169,14 +167,13 @@ app.get('/embed.js', (req, res) => {
   botButton.style.cursor = "pointer";
   botButton.style.boxShadow = "0px 4px 10px rgba(0,0,0,0.25)";
   botButton.style.zIndex = "999999";
-  
-  botButton.innerHTML = "🤖"; // You can replace with an image later
+  botButton.innerHTML = "🤖";
 
   document.body.appendChild(botButton);
 
-  // --- Create iframe but keep hidden ---
+  // --- Create iframe but hidden initially ---
   const iframe = document.createElement("iframe");
-  iframe.src = window.location.origin + "/chat?sdn=" + encodeURIComponent(sdn);
+  iframe.src = "${FRONTEND_URL}/chat?sdn=" + encodeURIComponent(sdn);
   iframe.style.position = "fixed";
   iframe.style.bottom = "100px";
   iframe.style.right = "20px";
@@ -189,13 +186,12 @@ app.get('/embed.js', (req, res) => {
   iframe.style.opacity = "0";
   iframe.style.transform = "scale(0.95)";
   iframe.style.transition = "opacity 0.3s ease, transform 0.3s ease";
-  iframe.style.display = "none"; // Hidden initially
+  iframe.style.display = "none";
 
-  document.body.appendChild(iframe)`;
+  document.body.appendChild(iframe);
 
   let isOpen = false;
 
-  // --- Toggle widget functionality ---
   botButton.addEventListener("click", () => {
     if (!isOpen) {
       iframe.style.display = "block";
@@ -206,11 +202,16 @@ app.get('/embed.js', (req, res) => {
     } else {
       iframe.style.opacity = "0";
       iframe.style.transform = "scale(0.95)";
-      setTimeout(() => (iframe.style.display = "none"), 300);
+      setTimeout(() => iframe.style.display = "none", 300);
     }
     isOpen = !isOpen;
   });
-})();
+})();`;
+
+  res.setHeader("Content-Type", "application/javascript");
+  res.send(embedScript);
+});
+
 
 
 
